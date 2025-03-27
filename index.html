@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Información de tu IP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+        .info {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            display: inline-block;
+            text-align: left;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop>
+        <source src="oruga.mp4" type="video/mp4">
+        Tu navegador no soporta la reproducción de videos.
+    </video>
+    
+    <audio id="bg-music" autoplay loop>
+        <source src="oruga.mp3" type="audio/mp3">
+        Tu navegador no soporta la reproducción de audio.
+    </audio>
+    
+    <h1>Información sobre tu IP</h1>
+    <div class="info" id="info">
+        <p>Obteniendo información...</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const audio = document.getElementById('bg-music');
+            audio.play().catch(error => console.log('Autoplay bloqueado:', error));
+        });
+
+        fetch('https://api64.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('info').innerHTML = `
+                    <p><strong>IP:</strong> ${data.ip}</p>
+                `;
+                return fetch(`https://ipapi.co/${data.ip}/json/`);
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('info').innerHTML += `
+                    <p><strong>Ciudad:</strong> ${data.city}</p>
+                    <p><strong>Región:</strong> ${data.region}</p>
+                    <p><strong>País:</strong> ${data.country_name}</p>
+                    <p><strong>ISP:</strong> ${data.org}</p>
+                    <p><strong>Ubicación:</strong> ${data.latitude}, ${data.longitude}</p>
+                `;
+            })
+            .catch(error => {
+                document.getElementById('info').innerHTML = '<p>Error al obtener la información.</p>';
+                console.error('Error:', error);
+            });
+    </script>
+</body>
+</html>
